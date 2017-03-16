@@ -5,7 +5,10 @@ Page({
   data:{
     inTheaters:{},
     comingSoon:{},
-    top250:{}
+    top250:{},
+    searchResult:{},
+    containerShow: true,
+    searchPanelShow: false
   },
   onLoad: function (event) {
     var inTheatersUrl = app.globalData.g_doubanBaseUrl + "/v2/movie/in_theaters" + "?start=0&count=3";
@@ -14,6 +17,22 @@ Page({
     this.getMovieListData(inTheatersUrl,'inTheaters','正在热映');
     this.getMovieListData(comingSoonUrl,'comingSoon','即将上映');
     this.getMovieListData(top250Url,'top250','Top250');
+  },
+
+  onMoreTap: function(event){
+    var category = event.currentTarget.dataset.category;
+    wx.navigateTo({
+      url: 'more-movie/more-movie?category='+category,
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
   },
 
   getMovieListData: function (url,key,categoryTitle) {
@@ -26,7 +45,6 @@ Page({
       }, // 设置请求的 header
       success: function (res) {
         // success
-        console.log(res.data);
         that.processDoubanData(res.data,key,categoryTitle);
       },
       fail: function () {
@@ -58,5 +76,41 @@ Page({
       movies: movies
     };
     this.setData(readyData);
+  },
+
+  onBindFocus: function(event){
+    this.setData({
+      containerShow: false,
+      searchPanelShow: true
+    })
+  },
+
+  onBindChange: function(event){
+    var text = event.detail.value;
+    var searchUrl = app.globalData.g_doubanBaseUrl + "/v2/movie/search?q=" + text;
+    this.getMovieListData(searchUrl,"searchResult","");
+  },
+
+  onCancelImgTap: function(event){
+    this.setData({
+      containerShow: true,
+      searchPanelShow: false
+    })
+  },
+
+  onMovieTap: function(event){
+    var movieId = event.currentTarget.dataset.movieid;
+    wx.navigateTo({
+      url: 'movie-detail/movie-detail?id='+movieId,
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
   }
 })
